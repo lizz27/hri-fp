@@ -1,0 +1,154 @@
+[0.000000] (-) TimerEvent: {}
+[0.001836] (control_architecture_pkg) JobQueued: {'identifier': 'control_architecture_pkg', 'dependencies': OrderedDict()}
+[0.002333] (robot_control_architecture_pkg) JobQueued: {'identifier': 'robot_control_architecture_pkg', 'dependencies': OrderedDict()}
+[0.004994] (control_architecture_pkg) JobStarted: {'identifier': 'control_architecture_pkg'}
+[0.089689] (robot_control_architecture_pkg) JobStarted: {'identifier': 'robot_control_architecture_pkg'}
+[0.100111] (-) TimerEvent: {}
+[0.201078] (-) TimerEvent: {}
+[0.302615] (-) TimerEvent: {}
+[0.403498] (-) TimerEvent: {}
+[0.504708] (-) TimerEvent: {}
+[0.606954] (-) TimerEvent: {}
+[0.710714] (-) TimerEvent: {}
+[0.811982] (-) TimerEvent: {}
+[0.913198] (-) TimerEvent: {}
+[1.014007] (-) TimerEvent: {}
+[1.118726] (-) TimerEvent: {}
+[1.220110] (-) TimerEvent: {}
+[1.320811] (-) TimerEvent: {}
+[1.423318] (-) TimerEvent: {}
+[1.527184] (-) TimerEvent: {}
+[1.628739] (-) TimerEvent: {}
+[1.731716] (-) TimerEvent: {}
+[1.834633] (-) TimerEvent: {}
+[1.935486] (-) TimerEvent: {}
+[2.036610] (-) TimerEvent: {}
+[2.138757] (-) TimerEvent: {}
+[2.240227] (-) TimerEvent: {}
+[2.341763] (-) TimerEvent: {}
+[2.442848] (-) TimerEvent: {}
+[2.543909] (-) TimerEvent: {}
+[2.644992] (-) TimerEvent: {}
+[2.746979] (-) TimerEvent: {}
+[2.847728] (-) TimerEvent: {}
+[2.949426] (-) TimerEvent: {}
+[3.050120] (-) TimerEvent: {}
+[3.153959] (-) TimerEvent: {}
+[3.256071] (-) TimerEvent: {}
+[3.356948] (-) TimerEvent: {}
+[3.458238] (-) TimerEvent: {}
+[3.559266] (-) TimerEvent: {}
+[3.660040] (-) TimerEvent: {}
+[3.761114] (-) TimerEvent: {}
+[3.865529] (-) TimerEvent: {}
+[3.966323] (-) TimerEvent: {}
+[4.067377] (-) TimerEvent: {}
+[4.168271] (-) TimerEvent: {}
+[4.270480] (-) TimerEvent: {}
+[4.372392] (-) TimerEvent: {}
+[4.478114] (-) TimerEvent: {}
+[4.579798] (-) TimerEvent: {}
+[4.682548] (-) TimerEvent: {}
+[4.784254] (-) TimerEvent: {}
+[4.888365] (-) TimerEvent: {}
+[4.989800] (-) TimerEvent: {}
+[5.095814] (-) TimerEvent: {}
+[5.198036] (-) TimerEvent: {}
+[5.298937] (-) TimerEvent: {}
+[5.404792] (-) TimerEvent: {}
+[5.505496] (-) TimerEvent: {}
+[5.607015] (-) TimerEvent: {}
+[5.710851] (-) TimerEvent: {}
+[5.812399] (-) TimerEvent: {}
+[5.913897] (-) TimerEvent: {}
+[6.018547] (-) TimerEvent: {}
+[6.119529] (-) TimerEvent: {}
+[6.222325] (-) TimerEvent: {}
+[6.323794] (-) TimerEvent: {}
+[6.425397] (-) TimerEvent: {}
+[6.530118] (-) TimerEvent: {}
+[6.632427] (-) TimerEvent: {}
+[6.737683] (-) TimerEvent: {}
+[6.840341] (-) TimerEvent: {}
+[6.942188] (-) TimerEvent: {}
+[7.048337] (-) TimerEvent: {}
+[7.150225] (-) TimerEvent: {}
+[7.235582] (control_architecture_pkg) Command: {'cmd': ['/usr/bin/python3', 'setup.py', 'egg_info', '--egg-base', '../../build/control_architecture_pkg', 'build', '--build-base', '/home/ubuntu/ros2_ws/build/control_architecture_pkg/build', 'install', '--record', '/home/ubuntu/ros2_ws/build/control_architecture_pkg/install.log', '--single-version-externally-managed'], 'cwd': '/home/ubuntu/ros2_ws/src/control_architecture_pkg', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'WORKSPACE_SETUP': '/opt/ros/humble/setup.bash', 'USER': 'ubuntu', 'SSH_CLIENT': '128.84.91.65 51508 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'MOTD_SHOWN': 'pam', 'HOME': '/home/ubuntu', 'CYCLONEDDS_URI': '/etc/turtlebot4/cyclonedds_rpi.xml', 'OLDPWD': '/home/ubuntu/ros2_ws/src', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'ROBOT_SETUP': '/etc/turtlebot4/setup.bash', 'ROS_DISTRO': 'humble', 'LOGNAME': 'ubuntu', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/humble/share', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '5', 'GAZEBO_MODEL_PATH': '/opt/ros/humble/share', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'FASTRTPS_DEFAULT_PROFILES_FILE': '/etc/turtlebot4/fastdds_discovery_super_client.xml', 'TURTLEBOT4_DIAGNOSTICS': '1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': 'localhost:10.0', 'LANG': 'C.UTF-8', 'RMW_IMPLEMENTATION': 'rmw_fastrtps_cpp', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'ROS_DOMAIN_ID': '1', 'AMENT_PREFIX_PATH': '/opt/ros/humble', 'SHELL': '/bin/bash', 'ROS_DISCOVERY_SERVER': '127.0.0.1:11811', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/humble/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/humble/share', 'ROBOT_NAMESPACE': '', 'PWD': '/home/ubuntu/ros2_ws/build/control_architecture_pkg', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '128.84.91.65 51508 10.52.16.30 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/ubuntu/ros2_ws/build/control_architecture_pkg/prefix_override:/home/ubuntu/ros2_ws/install/control_architecture_pkg/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1'}, 'shell': False}
+[7.251185] (-) TimerEvent: {}
+[7.352301] (-) TimerEvent: {}
+[7.454575] (-) TimerEvent: {}
+[7.557143] (-) TimerEvent: {}
+[7.662790] (-) TimerEvent: {}
+[7.711065] (robot_control_architecture_pkg) Command: {'cmd': ['/usr/bin/python3', 'setup.py', 'egg_info', '--egg-base', '../../build/robot_control_architecture_pkg', 'build', '--build-base', '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build', 'install', '--record', '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/install.log', '--single-version-externally-managed'], 'cwd': '/home/ubuntu/ros2_ws/src/robot_control_architecture_pkg', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'WORKSPACE_SETUP': '/opt/ros/humble/setup.bash', 'USER': 'ubuntu', 'SSH_CLIENT': '128.84.91.65 51508 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'MOTD_SHOWN': 'pam', 'HOME': '/home/ubuntu', 'CYCLONEDDS_URI': '/etc/turtlebot4/cyclonedds_rpi.xml', 'OLDPWD': '/home/ubuntu/ros2_ws/src', 'SSH_TTY': '/dev/pts/0', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'ROBOT_SETUP': '/etc/turtlebot4/setup.bash', 'ROS_DISTRO': 'humble', 'LOGNAME': 'ubuntu', 'IGN_GAZEBO_MODEL_PATH': '/opt/ros/humble/share', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '5', 'GAZEBO_MODEL_PATH': '/opt/ros/humble/share', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'FASTRTPS_DEFAULT_PROFILES_FILE': '/etc/turtlebot4/fastdds_discovery_super_client.xml', 'TURTLEBOT4_DIAGNOSTICS': '1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': 'localhost:10.0', 'LANG': 'C.UTF-8', 'RMW_IMPLEMENTATION': 'rmw_fastrtps_cpp', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'ROS_DOMAIN_ID': '1', 'AMENT_PREFIX_PATH': '/opt/ros/humble', 'SHELL': '/bin/bash', 'ROS_DISCOVERY_SERVER': '127.0.0.1:11811', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'IGN_GAZEBO_RESOURCE_PATH': '/opt/ros/humble/share', 'GAZEBO_RESOURCE_PATH': '/opt/ros/humble/share', 'ROBOT_NAMESPACE': '', 'PWD': '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '128.84.91.65 51508 10.52.16.30 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/prefix_override:/home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1'}, 'shell': False}
+[7.763219] (-) TimerEvent: {}
+[7.864438] (-) TimerEvent: {}
+[7.969282] (-) TimerEvent: {}
+[8.070716] (-) TimerEvent: {}
+[8.173330] (-) TimerEvent: {}
+[8.275397] (-) TimerEvent: {}
+[8.379297] (-) TimerEvent: {}
+[8.482569] (-) TimerEvent: {}
+[8.585409] (-) TimerEvent: {}
+[8.688185] (-) TimerEvent: {}
+[8.790512] (-) TimerEvent: {}
+[8.892009] (-) TimerEvent: {}
+[8.996292] (-) TimerEvent: {}
+[9.097123] (-) TimerEvent: {}
+[9.199144] (-) TimerEvent: {}
+[9.300718] (-) TimerEvent: {}
+[9.404478] (-) TimerEvent: {}
+[9.450828] (control_architecture_pkg) StdoutLine: {'line': b'running egg_info\n'}
+[9.451948] (control_architecture_pkg) StdoutLine: {'line': b'writing ../../build/control_architecture_pkg/control_architecture_pkg.egg-info/PKG-INFO\n'}
+[9.454628] (control_architecture_pkg) StdoutLine: {'line': b'writing dependency_links to ../../build/control_architecture_pkg/control_architecture_pkg.egg-info/dependency_links.txt\n'}
+[9.455722] (control_architecture_pkg) StdoutLine: {'line': b'writing entry points to ../../build/control_architecture_pkg/control_architecture_pkg.egg-info/entry_points.txt\n'}
+[9.456510] (control_architecture_pkg) StdoutLine: {'line': b'writing requirements to ../../build/control_architecture_pkg/control_architecture_pkg.egg-info/requires.txt\n'}
+[9.457387] (control_architecture_pkg) StdoutLine: {'line': b'writing top-level names to ../../build/control_architecture_pkg/control_architecture_pkg.egg-info/top_level.txt\n'}
+[9.472958] (control_architecture_pkg) StdoutLine: {'line': b"reading manifest file '../../build/control_architecture_pkg/control_architecture_pkg.egg-info/SOURCES.txt'\n"}
+[9.475216] (control_architecture_pkg) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[9.478455] (control_architecture_pkg) StdoutLine: {'line': b"writing manifest file '../../build/control_architecture_pkg/control_architecture_pkg.egg-info/SOURCES.txt'\n"}
+[9.479245] (control_architecture_pkg) StdoutLine: {'line': b'running build\n'}
+[9.479860] (control_architecture_pkg) StdoutLine: {'line': b'running build_py\n'}
+[9.482051] (control_architecture_pkg) StdoutLine: {'line': b'running install\n'}
+[9.485517] (control_architecture_pkg) StdoutLine: {'line': b'running install_lib\n'}
+[9.495974] (control_architecture_pkg) StdoutLine: {'line': b'running install_data\n'}
+[9.500184] (control_architecture_pkg) StdoutLine: {'line': b'running install_egg_info\n'}
+[9.504685] (-) TimerEvent: {}
+[9.515154] (control_architecture_pkg) StdoutLine: {'line': b"removing '/home/ubuntu/ros2_ws/install/control_architecture_pkg/lib/python3.10/site-packages/control_architecture_pkg-0.0.0-py3.10.egg-info' (and everything under it)\n"}
+[9.518698] (control_architecture_pkg) StdoutLine: {'line': b'Copying ../../build/control_architecture_pkg/control_architecture_pkg.egg-info to /home/ubuntu/ros2_ws/install/control_architecture_pkg/lib/python3.10/site-packages/control_architecture_pkg-0.0.0-py3.10.egg-info\n'}
+[9.527724] (control_architecture_pkg) StdoutLine: {'line': b'running install_scripts\n'}
+[9.605214] (-) TimerEvent: {}
+[9.642470] (control_architecture_pkg) StdoutLine: {'line': b'Installing robot_control_architecture_node script to /home/ubuntu/ros2_ws/install/control_architecture_pkg/lib/control_architecture_pkg\n'}
+[9.645380] (control_architecture_pkg) StdoutLine: {'line': b"writing list of installed files to '/home/ubuntu/ros2_ws/build/control_architecture_pkg/install.log'\n"}
+[9.705544] (-) TimerEvent: {}
+[9.808067] (-) TimerEvent: {}
+[9.907548] (control_architecture_pkg) CommandEnded: {'returncode': 0}
+[9.909001] (-) TimerEvent: {}
+[9.925748] (robot_control_architecture_pkg) StdoutLine: {'line': b'running egg_info\n'}
+[9.929276] (robot_control_architecture_pkg) StdoutLine: {'line': b'writing ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/PKG-INFO\n'}
+[9.930177] (robot_control_architecture_pkg) StdoutLine: {'line': b'writing dependency_links to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/dependency_links.txt\n'}
+[9.931206] (robot_control_architecture_pkg) StdoutLine: {'line': b'writing entry points to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/entry_points.txt\n'}
+[9.933188] (robot_control_architecture_pkg) StdoutLine: {'line': b'writing requirements to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/requires.txt\n'}
+[9.934213] (robot_control_architecture_pkg) StdoutLine: {'line': b'writing top-level names to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/top_level.txt\n'}
+[9.951937] (robot_control_architecture_pkg) StdoutLine: {'line': b"reading manifest file '../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/SOURCES.txt'\n"}
+[9.957919] (robot_control_architecture_pkg) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[9.958971] (robot_control_architecture_pkg) StdoutLine: {'line': b"writing manifest file '../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/SOURCES.txt'\n"}
+[9.959941] (robot_control_architecture_pkg) StdoutLine: {'line': b'running build\n'}
+[9.962165] (robot_control_architecture_pkg) StdoutLine: {'line': b'running build_py\n'}
+[9.965781] (robot_control_architecture_pkg) StdoutLine: {'line': b'running install\n'}
+[9.967079] (robot_control_architecture_pkg) StdoutLine: {'line': b'running install_lib\n'}
+[9.984691] (robot_control_architecture_pkg) StdoutLine: {'line': b'running install_data\n'}
+[9.987186] (robot_control_architecture_pkg) StdoutLine: {'line': b'running install_egg_info\n'}
+[10.005234] (robot_control_architecture_pkg) StdoutLine: {'line': b"removing '/home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg-0.0.0-py3.10.egg-info' (and everything under it)\n"}
+[10.005962] (robot_control_architecture_pkg) StdoutLine: {'line': b'Copying ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info to /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg-0.0.0-py3.10.egg-info\n'}
+[10.010243] (-) TimerEvent: {}
+[10.022000] (robot_control_architecture_pkg) StdoutLine: {'line': b'running install_scripts\n'}
+[10.095442] (control_architecture_pkg) JobEnded: {'identifier': 'control_architecture_pkg', 'rc': 0}
+[10.110508] (-) TimerEvent: {}
+[10.155864] (robot_control_architecture_pkg) StdoutLine: {'line': b'Installing robot_control_architecture_node script to /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/robot_control_architecture_pkg\n'}
+[10.157591] (robot_control_architecture_pkg) StdoutLine: {'line': b"writing list of installed files to '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/install.log'\n"}
+[10.210794] (-) TimerEvent: {}
+[10.313950] (-) TimerEvent: {}
+[10.370741] (robot_control_architecture_pkg) CommandEnded: {'returncode': 0}
+[10.414219] (-) TimerEvent: {}
+[10.429490] (robot_control_architecture_pkg) JobEnded: {'identifier': 'robot_control_architecture_pkg', 'rc': 0}
+[10.434810] (-) EventReactorShutdown: {}

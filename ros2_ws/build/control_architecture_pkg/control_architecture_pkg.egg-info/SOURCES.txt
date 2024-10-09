@@ -1,0 +1,17 @@
+LICENSE
+package.xml
+setup.cfg
+setup.py
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/PKG-INFO
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/SOURCES.txt
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/dependency_links.txt
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/entry_points.txt
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/requires.txt
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/top_level.txt
+../../build/control_architecture_pkg/control_architecture_pkg.egg-info/zip-safe
+control_architecture_pkg/__init__.py
+control_architecture_pkg/robot_control_architecture_node.py
+resource/control_architecture_pkg
+test/test_copyright.py
+test/test_flake8.py
+test/test_pep257.py

@@ -1,0 +1,38 @@
+[4.047s] Invoking command in '/home/ubuntu/ros2_ws/src/robot_control_architecture_pkg': PYTHONPATH=/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/prefix_override:/home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/robot_control_architecture_pkg build --build-base /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build install --record /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/install.log --single-version-externally-managed
+[5.413s] running egg_info
+[5.416s] creating ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info
+[5.417s] writing ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/PKG-INFO
+[5.418s] writing dependency_links to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/dependency_links.txt
+[5.419s] writing entry points to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/entry_points.txt
+[5.420s] writing requirements to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/requires.txt
+[5.421s] writing top-level names to ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/top_level.txt
+[5.421s] writing manifest file '../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/SOURCES.txt'
+[5.429s] reading manifest file '../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/SOURCES.txt'
+[5.430s] adding license file 'LICENSE'
+[5.433s] writing manifest file '../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info/SOURCES.txt'
+[5.435s] running build
+[5.435s] running build_py
+[5.436s] creating /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build
+[5.437s] creating /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib
+[5.438s] creating /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib/robot_control_architecture_pkg
+[5.438s] copying robot_control_architecture_pkg/robot_control_architecture_node.py -> /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib/robot_control_architecture_pkg
+[5.439s] copying robot_control_architecture_pkg/__init__.py -> /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib/robot_control_architecture_pkg
+[5.440s] running install
+[5.441s] running install_lib
+[5.443s] creating /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg
+[5.443s] copying /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib/robot_control_architecture_pkg/robot_control_architecture_node.py -> /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg
+[5.444s] copying /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build/lib/robot_control_architecture_pkg/__init__.py -> /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg
+[5.447s] byte-compiling /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg/robot_control_architecture_node.py to robot_control_architecture_node.cpython-310.pyc
+[5.450s] byte-compiling /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg/__init__.py to __init__.cpython-310.pyc
+[5.450s] running install_data
+[5.453s] creating /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/share/ament_index
+[5.454s] creating /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/share/ament_index/resource_index
+[5.454s] creating /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/share/ament_index/resource_index/packages
+[5.458s] copying resource/robot_control_architecture_pkg -> /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/share/ament_index/resource_index/packages
+[5.458s] copying package.xml -> /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/share/robot_control_architecture_pkg
+[5.459s] running install_egg_info
+[5.467s] Copying ../../build/robot_control_architecture_pkg/robot_control_architecture_pkg.egg-info to /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot_control_architecture_pkg-0.0.0-py3.10.egg-info
+[5.474s] running install_scripts
+[5.558s] Installing robot_control_architecture_node script to /home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/robot_control_architecture_pkg
+[5.560s] writing list of installed files to '/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/install.log'
+[5.705s] Invoked command in '/home/ubuntu/ros2_ws/src/robot_control_architecture_pkg' returned '0': PYTHONPATH=/home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/prefix_override:/home/ubuntu/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/robot_control_architecture_pkg build --build-base /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/build install --record /home/ubuntu/ros2_ws/build/robot_control_architecture_pkg/install.log --single-version-externally-managed
