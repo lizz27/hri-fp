@@ -1,37 +1,19 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>robot_control_architecture_pkg</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="ar2559@cornell.edu">Archit Reddy</maintainer>
+  <version>0.0.1</version>
+  <description>ROS 2 package for a robot control architecture that approaches a person while avoiding obstacles using a finite state machine.</description>
+  <maintainer email="your.email@example.com">Your Name</maintainer>
   <license>Apache-2.0</license>
 
-  <depend>rclcpp</depend>
-  <depend>cv_bridge</depend>
-  <depend>camera_info_manager</depend>
-  <depend>depthai</depend>
-  <depend>depthai_ros_msgs</depend>
-  <depend>depthai_bridge</depend>
-  <depend>depthai_descriptions</depend>
-  <depend>image_transport</depend>
-  <depend>libopency-dev</depend>
-  <depend>ros_environment</depend>
-  <depend>sensor_msgs</depend>
-  <depend>std_msgs</depend>
-  <depend>stereo_msgs</depend>
-  <depend>vision_msgs</depend>
-  <depend>rviz_imu_plugin</depend>
-
-  <exec_depend>robot_state_publisher</exec_depend>
-  <exec_depend>depth_image_proc</exec_depend>
-
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
+  <!-- Execution dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>vision_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>
   </export>
-  </package>
+</package>

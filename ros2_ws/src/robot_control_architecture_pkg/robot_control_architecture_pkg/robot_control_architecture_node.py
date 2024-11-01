@@ -1,228 +1,326 @@
+import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
-from rclpy.time import Time
-from rclpy.duration import Duration
-from sensor_msgs.msg import LaserScan, Image
 from geometry_msgs.msg import Twist
 from vision_msgs.msg import Detection2DArray
-from cv_bridge import CvBridge
+from sensor_msgs.msg import LaserScan, Image
+import math
 import numpy as np
 
 
-class RobotControlArchitecture(Node):
-    '''
-    Node for controlling the robot using a Finite State Machine (FSM) to navigate
-    toward a person while avoiding obstacles.
-    '''
+class ApproachPersonAvoidObstaclesNode(Node):
+    """
+    A ROS2 node that enables the robot to approach a detected person while avoiding obstacles.
+    """
 
     def __init__(self):
-        '''
-        Initialize the robot control node, setting up state machine, subscribers, and publishers.
-        '''
-        super().__init__('robot_control_architecture')
+        super().__init__("approach_person_avoid_obstacles")
 
-        # Define FSM states
-        self.FORWARD = 0
-        self.BACK = 1
-        self.TURN = 2
-        self.TRACK_PERSON = 3
-        self.STOP = 4
-        self.state = self.FORWARD
-        self.state_ts = self.get_clock().now()
+        # FSM States
+        self.SEARCHING = 0
+        self.APPROACHING = 1
+        self.AVOIDING = 2
+        self.ARRIVED = 3
+        self.state = self.SEARCHING
 
-        # Define FSM timers and parameters
-        self.TURNING_TIME = 2.0 # 2 seconds
-        self.BACKING_TIME = 2.0 # 2 seconds
-        self.SCAN_TIMEOUT = 1.0 # 1 second
-        self.PERSON_DETECTED_TIMEOUT = 1.0 # 1 second for detecting person
-        self.SPEED_LINEAR = 0.3
-        self.SPEED_ANGULAR = 0.3
-        self.OBSTACLE_DISTANCE = 1.0  # meters
+        # Control Parameters
+        self.SPEED_LINEAR_MAX = 0.2  # Maximum linear speed (m/s)
+        self.SPEED_LINEAR_MIN = 0.05  # Minimum linear speed (m/s)
+        self.SPEED_ANGULAR_MAX = 1.0  # Maximum angular speed (rad/s)
+        self.DISTANCE_TOLERANCE = 20  # Tolerance in bounding box height (pixels)
 
-        # Create a CvBridge object for converting ROS images to OpenCV format
-        self.br = CvBridge()
+        self.DESIRED_SIZE_Y = 300  # Desired bounding box height (pixels)
+        self.Kp_linear = 0.001  # Proportional gain for linear speed
+        self.Kp_angular = 1.0  # Proportional gain for angular speed
 
-        # Variables to store the latest sensor data
-        self.last_scan = None
-        self.last_rgb_image = None
-        self.last_depth_image = None
+        self.OBSTACLE_DISTANCE_THRESHOLD = 0.5  # Obstacle detection distance (meters)
+
+        # Image size (will be updated from image topic)
+        self.IMAGE_WIDTH = 640  # Default image width (pixels)
+        self.IMAGE_HEIGHT = 480  # Default image height (pixels)
+
+        # Variables to store sensor data and state information
         self.person_detected = False
-        self.person_detection_ts = None
+        self.person_center_x = 0.0
+        self.person_size_y = 0.0
 
-        # Subscribe to Lidar scan
-        self.scan_sub = self.create_subscription(
-            LaserScan,
-            'scan',
-            self.scan_callback,
-            qos_profile_sensor_data
-        )
+        self.obstacle_detected = False
+        self.min_obstacle_distance = float("inf")
+        self.scan_data = None  # Store the full scan data
 
-        # Subscribe to RGB camera image
-        self.rgb_sub = self.create_subscription(
-            Image,
-            '/color/image',
-            self.rgb_callback,
-            10
-        )
-
-        # Subscribe to depth image
-        self.depth_sub = self.create_subscription(
-            Image,
-            '/stereo/depth',
-            self.depth_callback,
-            10
-        )
-
-        # Subscribe to MobileNet pedestrian detections (YOLO output)
-        self.person_detection_sub = self.create_subscription(
+        # Subscribers
+        self.detection_sub = self.create_subscription(
             Detection2DArray,
-            '/color/mobilenet_detections',
-            self.person_detection_callback,
-            10
+            "/color/mobilenet_detections",
+            self.detection_callback,
+            qos_profile_sensor_data,
         )
 
-        # Publisher for robot velocity commands
-        self.vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.scan_sub = self.create_subscription(
+            LaserScan, "/scan", self.scan_callback, qos_profile_sensor_data
+        )
 
-        # Timer for controlling robot behavior based on sensor data
-        self.timer = self.create_timer(0.05, self.control_cycle)
+        self.image_sub = self.create_subscription(
+            Image, "/color/image", self.image_callback, qos_profile_sensor_data
+        )
+
+        self.depth_sub = self.create_subscription(
+            Image, "/stereo/depth", self.depth_callback, qos_profile_sensor_data
+        )
+
+        # Publisher
+        self.vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
+
+        # Timer for control loop
+        self.timer = self.create_timer(0.1, self.control_loop)
+
+    def detection_callback(self, msg):
+        """
+        Callback function for detection messages.
+        Processes detections to find the person with the largest bounding box.
+        """
+        self.person_detected = False  # Reset detection flag
+        max_size_y = 0.0
+
+        # Iterate over detections to find persons (class_id == '15')
+        for detection in msg.detections:
+            for result in detection.results:
+                if result.hypothesis.class_id == "15":
+                    bbox = detection.bbox
+                    size_y = bbox.size_y
+                    if size_y > max_size_y:
+                        # Update the largest person detected
+                        self.person_detected = True
+                        self.person_center_x = (
+                            bbox.center.position.x
+                        )  # Center x of bounding box
+                        self.person_size_y = size_y  # Height of bounding box
+                        max_size_y = size_y  # Update max_size_y
+
+        if self.person_detected:
+            self.get_logger().info(
+                f"Person detected at x={self.person_center_x}, size_y={self.person_size_y}"
+            )
+        else:
+            self.get_logger().info("No person detected")
 
     def scan_callback(self, msg):
-        '''
-        Callback function to handle Lidar scan messages.
-        '''
-        self.last_scan = msg
+        """
+        Callback function for scan messages.
+        Processes laser scan data to detect obstacles.
+        """
+        self.scan_data = msg
+        # Consider only valid ranges (ignore NaN or inf)
+        valid_ranges = [
+            r for r in msg.ranges if not math.isnan(r) and not math.isinf(r)
+        ]
+        if valid_ranges:
+            self.min_obstacle_distance = min(valid_ranges)
+        else:
+            self.min_obstacle_distance = float("inf")
 
-    def rgb_callback(self, msg):
-        '''
-        Callback function to handle RGB image messages.
-        '''
-        self.last_rgb_image = self.br.imgmsg_to_cv2(msg, "bgr8")
+        # Check if obstacle is within threshold distance in front
+        front_angles = range(-10, 10)
+        obstacle_in_front = False
+        for angle in front_angles:
+            index = (angle - msg.angle_min) / msg.angle_increment
+            index = int(index) % len(msg.ranges)
+            distance = msg.ranges[index]
+            if not math.isnan(distance) and distance < self.OBSTACLE_DISTANCE_THRESHOLD:
+                obstacle_in_front = True
+                break
+
+        self.obstacle_detected = obstacle_in_front
+        self.get_logger().info(
+            f"Min obstacle distance: {self.min_obstacle_distance:.2f}, Obstacle detected: {self.obstacle_detected}"
+        )
+
+    def image_callback(self, msg):
+        """
+        Callback function for image messages.
+        Retrieves image width and height.
+        """
+        self.IMAGE_WIDTH = msg.width
+        self.IMAGE_HEIGHT = msg.height
+        self.get_logger().info(
+            f"Image size: width={self.IMAGE_WIDTH}, height={self.IMAGE_HEIGHT}"
+        )
 
     def depth_callback(self, msg):
-        '''
-        Callback function to handle depth image messages.
-        '''
-        self.last_depth_image = self.br.imgmsg_to_cv2(msg, "32FC1")
+        """
+        Callback function for depth images.
+        """
+        # Process depth data if needed
+        pass
 
-    def person_detection_callback(self, msg):
-        '''
-        Callback function to handle YOLO person detection messages.
-        '''
-        if len(msg.detections) > 0:
-            self.person_detected = True
-            self.person_detection_ts = self.get_clock().now()
-
-    def control_cycle(self):
-        '''
-        Main control loop to handle state transitions and robot movement based on sensor inputs.
-        '''
-        if self.last_scan is None:
-            return  # Wait for the first scan message
-
+    def control_loop(self):
+        """
+        Main control loop. Adjusts robot motion based on FSM state.
+        """
         out_vel = Twist()
 
-        if self.state == self.FORWARD:
-            out_vel.linear.x = self.SPEED_LINEAR
+        if self.state == self.SEARCHING:
+            # State: SEARCHING
+            # Behavior: Rotate to look for a person
+            self.get_logger().info("State: SEARCHING")
 
-            if self.check_obstacle_ahead():
-                self.go_state(self.BACK)
-            elif self.check_person_detected():
-                self.go_state(self.TRACK_PERSON)
+            if self.person_detected:
+                self.state = self.APPROACHING
+            else:
+                # Rotate in place to search for a person
+                out_vel.angular.z = (
+                    self.SPEED_ANGULAR_MAX / 2
+                )  # Rotate at half max speed
+                out_vel.linear.x = 0.0
+                self.get_logger().info("Searching for person: Rotating")
 
-        elif self.state == self.BACK:
-            out_vel.linear.x = -self.SPEED_LINEAR
+        elif self.state == self.APPROACHING:
+            # State: APPROACHING
+            self.get_logger().info("State: APPROACHING")
 
-            if self.check_back_2_turn():
-                self.go_state(self.TURN)
+            if not self.person_detected:
+                # Person lost, go back to SEARCHING
+                self.state = self.SEARCHING
+            elif self.obstacle_detected:
+                # Obstacle detected, switch to AVOIDING
+                self.state = self.AVOIDING
+            else:
+                # Approach the person
+                # Calculate the horizontal error (normalized between -1 and 1)
+                error_x = (self.person_center_x - self.IMAGE_WIDTH / 2) / (
+                    self.IMAGE_WIDTH / 2
+                )
 
-        elif self.state == self.TURN:
-            out_vel.angular.z = self.SPEED_ANGULAR
+                # Proportional control for angular speed
+                angular_z = (
+                    -self.Kp_angular * error_x
+                )  # Negative because positive angular_z is counter-clockwise
 
-            if self.check_turn_2_forward():
-                self.go_state(self.FORWARD)
+                # Limit angular speed
+                angular_z = max(
+                    min(angular_z, self.SPEED_ANGULAR_MAX), -self.SPEED_ANGULAR_MAX
+                )
 
-        elif self.state == self.TRACK_PERSON:
-            # Track the person, for simplicity we're just moving forward toward them
-            out_vel.linear.x = self.SPEED_LINEAR
-            if self.check_obstacle_ahead():
-                self.go_state(self.BACK)
+                # Calculate linear speed based on the size of the bounding box
+                # As person_size_y increases, we get closer to the person
+                error_size_y = self.DESIRED_SIZE_Y - self.person_size_y
 
-            # If the person detection times out, return to forward state
-            if self.check_person_timeout():
-                self.go_state(self.FORWARD)
+                if error_size_y > self.DISTANCE_TOLERANCE:
+                    # Person is too far, move forward
+                    linear_x = self.Kp_linear * error_size_y
+                    # Limit linear speed
+                    linear_x = max(
+                        min(linear_x, self.SPEED_LINEAR_MAX), self.SPEED_LINEAR_MIN
+                    )
+                elif error_size_y < -self.DISTANCE_TOLERANCE:
+                    # Person is too close, stop
+                    linear_x = 0.0
+                    # Transition to ARRIVED state
+                    self.state = self.ARRIVED
+                else:
+                    # Within distance tolerance, stop
+                    linear_x = 0.0
+                    # Transition to ARRIVED state
+                    self.state = self.ARRIVED
 
-        elif self.state == self.STOP:
-            if self.check_stop_2_forward():
-                self.go_state(self.FORWARD)
+                # Set velocities
+                out_vel.linear.x = linear_x
+                out_vel.angular.z = angular_z
 
+                self.get_logger().info(
+                    f"Moving towards person: linear_x={linear_x:.2f}, angular_z={angular_z:.2f}"
+                )
+
+        elif self.state == self.AVOIDING:
+            # State: AVOIDING
+            self.get_logger().info("State: AVOIDING")
+
+            if not self.obstacle_detected:
+                # Obstacle cleared
+                if self.person_detected:
+                    self.state = self.APPROACHING
+                else:
+                    self.state = self.SEARCHING
+            else:
+                # Avoid the obstacle by finding the clearest path
+                if self.scan_data is not None:
+                    # Convert scan data to numpy array
+                    scan_ranges = np.array(self.scan_data.ranges)
+                    scan_angles = np.linspace(
+                        self.scan_data.angle_min,
+                        self.scan_data.angle_max,
+                        len(scan_ranges),
+                    )
+
+                    # Filter out invalid readings
+                    valid_indices = np.where(np.isfinite(scan_ranges))
+                    valid_ranges = scan_ranges[valid_indices]
+                    valid_angles = scan_angles[valid_indices]
+
+                    # Find the direction with maximum distance
+                    if len(valid_ranges) > 0:
+                        max_distance_index = np.argmax(valid_ranges)
+                        max_distance_angle = valid_angles[max_distance_index]
+
+                        # Calculate the angular error to the clearest path
+                        angular_error = max_distance_angle
+                        angular_z = self.Kp_angular * angular_error
+                        angular_z = max(
+                            min(angular_z, self.SPEED_ANGULAR_MAX),
+                            -self.SPEED_ANGULAR_MAX,
+                        )
+
+                        # Set a forward speed proportional to the obstacle distance in that direction
+                        linear_x = self.SPEED_LINEAR_MAX * (
+                            valid_ranges[max_distance_index] / max(valid_ranges)
+                        )
+                        linear_x = max(
+                            min(linear_x, self.SPEED_LINEAR_MAX), self.SPEED_LINEAR_MIN
+                        )
+
+                        # Set velocities
+                        out_vel.linear.x = linear_x
+                        out_vel.angular.z = angular_z
+
+                        self.get_logger().info(
+                            f"Avoiding obstacle: linear_x={linear_x:.2f}, angular_z={angular_z:.2f}"
+                        )
+                    else:
+                        # No valid ranges, stop
+                        out_vel.linear.x = 0.0
+                        out_vel.angular.z = self.SPEED_ANGULAR_MAX
+                        self.get_logger().info("No valid LIDAR data, turning in place")
+                else:
+                    # No scan data, stop
+                    out_vel.linear.x = 0.0
+                    out_vel.angular.z = self.SPEED_ANGULAR_MAX
+                    self.get_logger().info("No scan data, turning in place")
+
+        elif self.state == self.ARRIVED:
+            # State: ARRIVED
+            self.get_logger().info("State: ARRIVED")
+
+            # Stop the robot
+            out_vel.linear.x = 0.0
+            out_vel.angular.z = 0.0
+
+            # Optionally, after some time, we can go back to SEARCHING
+            # For now, stay in ARRIVED state
+
+        # Publish the velocities
         self.vel_pub.publish(out_vel)
-
-    def go_state(self, new_state):
-        '''
-        Transition to a new state and update the timestamp.
-        '''
-        self.state = new_state
-        self.state_ts = self.get_clock().now()
-
-    def check_obstacle_ahead(self):
-        '''
-        Check if an obstacle is detected ahead of the robot using Lidar data.
-        '''
-        if self.last_scan is None:
-            return False
-        # Check the front of the Lidar scan
-        front_idx = len(self.last_scan.ranges) // 2
-        return self.last_scan.ranges[front_idx] < self.OBSTACLE_DISTANCE
-
-    def check_person_detected(self):
-        '''
-        Check if a person has been detected using the YOLO detections.
-        '''
-        return self.person_detected
-
-    def check_person_timeout(self):
-        '''
-        Check if the person detection has timed out.
-        '''
-        if self.person_detection_ts is None:
-            return False
-        elapsed = self.get_clock().now() - self.person_detection_ts
-        return elapsed > Duration(seconds=self.PERSON_DETECTED_TIMEOUT)
-
-    def check_back_2_turn(self):
-        '''
-        Check if it's time to transition from backing up to turning.
-        '''
-        elapsed = self.get_clock().now() - self.state_ts
-        return elapsed > Duration(seconds=self.BACKING_TIME)
-
-    def check_turn_2_forward(self):
-        '''
-        Check if it's time to transition from turning to moving forward.
-        '''
-        elapsed = self.get_clock().now() - self.state_ts
-        return elapsed > Duration(seconds=self.TURNING_TIME)
-
-    def check_stop_2_forward(self):
-        '''
-        Check if it's time to transition from stop to moving forward.
-        '''
-        elapsed = self.get_clock().now() - Time.from_msg(self.last_scan.header.stamp)
-        return elapsed < Duration(seconds=self.SCAN_TIMEOUT)
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    robot_control_architecture_node = RobotControlArchitecture()
+    node = ApproachPersonAvoidObstaclesNode()
 
-    rclpy.spin(robot_control_architecture_node)
+    rclpy.spin(node)
 
-    robot_control_architecture_node.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
