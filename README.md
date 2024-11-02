@@ -14,6 +14,7 @@ Run the YOLO object detection node:
 
 ```bash
 ros2 launch depthai_examples mobile_publisher.launch.py
+ros2 launch depthai_examples rgb_stereo_node.launch.py
 ```
 
 Open a new terminal, check if the topic exists:
