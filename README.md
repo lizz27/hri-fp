@@ -1,4 +1,12 @@
-# HRI Lab 3
+# HRI Final Project
+
+## Authors
+
+- Henry Bao (hb482)
+- Liz Wang (sw2333)
+- Yuan Liu (Alan) (yl3688)
+- Yufan Zhang (Bryce) (yz2894)
+- Waranun Wachakorn (Peary) (ww554)
 
 ## How-To
 
