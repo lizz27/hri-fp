@@ -1,64 +1,45 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
+import random
+import math
+import subprocess
 from geometry_msgs.msg import Twist
-from vision_msgs.msg import Detection2DArray
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
-import numpy as np
-from enum import Enum
+from sensor_msgs.msg import LaserScan
 
 
-class State(Enum):
-    SEARCH_PERSON = 1
-    APPROACH_PERSON = 2
-    AVOID_OBSTACLE = 3
-    REACHED_PERSON = 4
-
-
-class ApproachPersonNode(Node):
+class GreenRedLightGameNode(Node):
     """
-    A ROS2 node that enables the robot to approach a detected person using OAK-D camera detections,
-    while avoiding obstacles using depth data.
+    A ROS2 node that implements the "Green Light, Red Light" game.
     """
 
     def __init__(self):
-        super().__init__("approach_person")
+        super().__init__("green_red_light_game")
 
-        # Constants
-        self.SPEED_LINEAR_MAX = 0.5  # Maximum linear speed (m/s)
-        self.SPEED_LINEAR_MIN = 0.05  # Minimum linear speed (m/s)
-        self.SPEED_ANGULAR_MAX = 1.0  # Maximum angular speed (rad/s)
-        self.IMAGE_WIDTH = 300  # Width of the camera image (pixels)
-        self.IMAGE_HEIGHT = 300  # Height of the camera image (pixels)
-        self.DISTANCE_TOLERANCE = 20  # Tolerance in bounding box height (pixels)
+        # FSM States
+        self.STATE_IDLE = 0
+        self.STATE_GREEN_LIGHT = 1
+        self.STATE_RED_LIGHT = 2
+        self.STATE_END_GAME = 3
 
-        self.DESIRED_SIZE_Y = 400  # Desired bounding box height
-        self.Kp_linear = 0.001  # Proportional gain for linear speed
-        self.Kp_angular = 1.0  # Proportional gain for angular speed
+        self.state = self.STATE_IDLE
+        self.state_start_time = self.get_clock().now()
 
-        # Obstacle avoidance parameters
+        # Game Parameters
+        self.GREEN_LIGHT_DURATION = 10.0  # seconds
+        self.RED_LIGHT_MIN_DURATION = 5.0  # seconds
+        self.RED_LIGHT_MAX_DURATION = 10.0  # seconds
+        self.MOVEMENT_SPEED = 0.2  # m/s
+        self.ROTATION_SPEED = 0.5  # rad/s
         self.OBSTACLE_DISTANCE_THRESHOLD = 0.5  # meters
-        self.DEPTH_IMAGE_WIDTH = 640  # Width of depth image
-        self.DEPTH_IMAGE_HEIGHT = 480  # Height of depth image
+        self.BOUNDARY_DISTANCE_THRESHOLD = 0.3  # meters
 
-        # Initialize state
-        self.state = State.SEARCH_PERSON
+        # Direction Variables
+        self.current_direction_angle = 0.0  # radians
 
         # Subscribers
-        self.detection_sub = self.create_subscription(
-            Detection2DArray,
-            "/color/mobilenet_detections",
-            self.detection_callback,
-            qos_profile_sensor_data,
-        )
-
-        self.depth_sub = self.create_subscription(
-            Image, "/stereo/depth", self.depth_callback, qos_profile_sensor_data
-        )
-
-        self.rgb_sub = self.create_subscription(
-            Image, "/color/image", self.rgb_callback, qos_profile_sensor_data
+        self.scan_sub = self.create_subscription(
+            LaserScan, "/scan", self.scan_callback, qos_profile_sensor_data
         )
 
         # Publisher for cmd_vel
@@ -67,223 +48,232 @@ class ApproachPersonNode(Node):
         # Timer for control loop
         self.timer = self.create_timer(0.1, self.control_loop)
 
-        # Variables to store the latest detection
-        self.person_detected = False
-        self.person_center_x = 0.0
-        self.person_size_y = 0.0
+        # Variables to store sensor data
+        self.last_scan = None
 
-        # Variables for depth image
-        self.depth_image = None
-        self.bridge = CvBridge()
+        # Players remaining (this would ideally be managed by a human judge)
+        self.players_remaining = 5  # Start with 5 players
 
-    def detection_callback(self, msg):
-        """
-        Callback function for detection messages.
-        Processes detections to find the person with the largest bounding box.
-        """
-        self.person_detected = False  # Reset detection flag
-        max_size_y = 0.0
+        self.get_logger().info("GreenRedLightGameNode has been started.")
 
-        # Iterate over detections to find persons (class_id == '15')
-        for detection in msg.detections:
-            for result in detection.results:
-                if result.hypothesis.class_id == "15":
-                    bbox = detection.bbox
-                    size_y = bbox.size_y
-                    if size_y > max_size_y:
-                        # Update the largest person detected
-                        self.person_detected = True
-                        self.person_center_x = (
-                            bbox.center.position.x
-                        )  # Center x of bounding box
-                        self.person_size_y = size_y  # Height of bounding box
-                        max_size_y = size_y  # Update max_size_y
-
-        if self.person_detected:
-            self.get_logger().info(
-                f"Person detected at x={self.person_center_x}, size_y={self.person_size_y}"
-            )
-
-    def depth_callback(self, msg):
+    def scan_callback(self, msg):
         """
-        Callback function for depth image messages.
-        Converts the depth image to a numpy array.
+        Callback function for scan messages.
+        Stores the latest scan data.
         """
-        try:
-            # Convert the depth image to a numpy array
-            self.depth_image = self.bridge.imgmsg_to_cv2(
-                msg, desired_encoding="passthrough"
-            )
-            # self.depth_image is now a numpy array with depth values in meters
-        except Exception as e:
-            self.get_logger().error(f"Depth callback error: {e}")
-            self.depth_image = None
-
-    def rgb_callback(self, msg):
-        """
-        Callback function for RGB image messages.
-        For now, we will not process the RGB image.
-        """
-        pass  # No processing needed currently
+        self.last_scan = msg
 
     def control_loop(self):
         """
-        Main control loop. Adjusts robot motion based on the current state.
+        Main control loop. Adjusts robot motion based on FSM.
         """
         out_vel = Twist()
+        current_time = self.get_clock().now()
 
-        if self.state == State.SEARCH_PERSON:
-            # Rotate in place to search for person
-            out_vel.angular.z = 0.5  # Rotate at a constant speed
-            self.get_logger().info("Searching for person...")
-            if self.person_detected:
-                self.get_logger().info(
-                    "Person found, switching to APPROACH_PERSON state."
-                )
-                self.state = State.APPROACH_PERSON
+        if self.state == self.STATE_IDLE:
+            # Wait for game start command
+            # For this example, we'll start the game automatically after 5 seconds
+            elapsed_time = (current_time - self.state_start_time).nanoseconds / 1e9
+            if elapsed_time > 5.0:
+                self.state = self.STATE_GREEN_LIGHT
+                self.state_start_time = self.get_clock().now()
+                self.play_audio("green_light.wav")
+                self.get_logger().info("Game started. Switching to GREEN_LIGHT state.")
 
-        elif self.state == State.APPROACH_PERSON:
-            if self.person_detected:
-                # Check for obstacles
-                obstacle_detected = self.check_for_obstacles()
-
-                if obstacle_detected:
-                    self.get_logger().info(
-                        "Obstacle detected, switching to AVOID_OBSTACLE state."
-                    )
-                    self.state = State.AVOID_OBSTACLE
-                else:
-                    # Proceed to approach person
-                    # Calculate the horizontal error (normalized between -1 and 1)
-                    error_x = (self.person_center_x - self.IMAGE_WIDTH / 2) / (
-                        self.IMAGE_WIDTH / 2
-                    )
-
-                    # Proportional control for angular speed
-                    angular_z = (
-                        -self.Kp_angular * error_x
-                    )  # Negative because positive angular_z is counter-clockwise
-
-                    # Limit angular speed
-                    angular_z = max(
-                        min(angular_z, self.SPEED_ANGULAR_MAX), -self.SPEED_ANGULAR_MAX
-                    )
-
-                    # Calculate linear speed based on the size of the bounding box
-                    # As person_size_y increases, we get closer to the person
-                    error_size_y = self.DESIRED_SIZE_Y - self.person_size_y
-
-                    if error_size_y > self.DISTANCE_TOLERANCE:
-                        # Person is too far, move forward
-                        linear_x = self.Kp_linear * error_size_y
-                        # Limit linear speed
-                        linear_x = max(
-                            min(linear_x, self.SPEED_LINEAR_MAX), self.SPEED_LINEAR_MIN
-                        )
-                    elif error_size_y < -self.DISTANCE_TOLERANCE:
-                        # Person is too close, stop or move backward if desired
-                        linear_x = 0.0  # For now, just stop
-                        # Optionally, transition to REACHED_PERSON state
-                        self.get_logger().info(
-                            "Reached person, switching to REACHED_PERSON state."
-                        )
-                        self.state = State.REACHED_PERSON
-                    else:
-                        # Within distance tolerance, stop
-                        linear_x = 0.0
-                        # Optionally, transition to REACHED_PERSON state
-                        self.get_logger().info(
-                            "Reached person, switching to REACHED_PERSON state."
-                        )
-                        self.state = State.REACHED_PERSON
-
-                    # Set velocities
-                    out_vel.linear.x = linear_x
-                    out_vel.angular.z = angular_z
-
-                    self.get_logger().info(
-                        f"Approaching person: linear_x={linear_x:.2f}, angular_z={angular_z:.2f}"
-                    )
-
-            else:
-                # Person lost, switch to SEARCH_PERSON
-                self.get_logger().info("Person lost, switching to SEARCH_PERSON state.")
-                self.state = State.SEARCH_PERSON
-
-        elif self.state == State.AVOID_OBSTACLE:
-            # Implement obstacle avoidance behavior
-            # For simplicity, we can turn left or right until the path is clear
-            obstacle_detected = self.check_for_obstacles()
-
-            if obstacle_detected:
-                # Rotate to avoid obstacle
-                out_vel.angular.z = 0.5  # Rotate at a constant speed
-                self.get_logger().info("Avoiding obstacle...")
-            else:
-                # Path is clear, switch back to APPROACH_PERSON
-                self.get_logger().info(
-                    "Obstacle avoided, switching back to APPROACH_PERSON state."
-                )
-                self.state = State.APPROACH_PERSON
-
-        elif self.state == State.REACHED_PERSON:
-            # Robot has reached the person, stop moving
+        elif self.state == self.STATE_GREEN_LIGHT:
+            # Robot remains stationary
             out_vel.linear.x = 0.0
             out_vel.angular.z = 0.0
-            self.get_logger().info("Reached person, waiting...")
-            # Optionally, you can add code to handle what happens when the person moves away
-            if not self.person_detected:
-                self.get_logger().info("Person lost, switching to SEARCH_PERSON state.")
-                self.state = State.SEARCH_PERSON
+            elapsed_time = (current_time - self.state_start_time).nanoseconds / 1e9
+            if elapsed_time > self.GREEN_LIGHT_DURATION:
+                # Transition to Red Light
+                self.state = self.STATE_RED_LIGHT
+                self.state_start_time = self.get_clock().now()
+                self.play_audio("red_light.wav")
+                self.random_direction()
+                self.get_logger().info("Switching to RED_LIGHT state.")
+
+        elif self.state == self.STATE_RED_LIGHT:
+            # Move in the selected random direction
+            out_vel.linear.x = self.MOVEMENT_SPEED
+            out_vel.angular.z = (
+                0.0  # Assume robot is already facing the correct direction
+            )
+
+            # Check for collision with player or boundary
+            collision = self.detect_collision()
+            boundary_reached = self.detect_boundary()
+
+            if collision:
+                # Stop movement
+                out_vel.linear.x = 0.0
+                # Signal player is out
+                self.play_audio("player_out.wav")
+                self.players_remaining -= 1
+                self.get_logger().info(
+                    f"Player hit! Players remaining: {self.players_remaining}"
+                )
+                if self.players_remaining > 1:
+                    # Transition to Green Light
+                    self.state = self.STATE_GREEN_LIGHT
+                    self.state_start_time = self.get_clock().now()
+                    self.play_audio("green_light.wav")
+                    self.get_logger().info("Switching to GREEN_LIGHT state.")
+                else:
+                    # Transition to End Game
+                    self.state = self.STATE_END_GAME
+                    self.state_start_time = self.get_clock().now()
+                    self.get_logger().info(
+                        "Only one player remaining. Switching to END_GAME state."
+                    )
+            elif boundary_reached:
+                # Stop movement
+                out_vel.linear.x = 0.0
+                # Change direction
+                self.random_direction()
+                # Transition to Green Light
+                self.state = self.STATE_GREEN_LIGHT
+                self.state_start_time = self.get_clock().now()
+                self.play_audio("green_light.wav")
+                self.get_logger().info(
+                    "Boundary reached. Switching to GREEN_LIGHT state."
+                )
+            else:
+                # Continue moving
+                pass
+
+        elif self.state == self.STATE_END_GAME:
+            # Stop the robot
+            out_vel.linear.x = 0.0
+            out_vel.angular.z = 0.0
+            # Announce winner
+            self.play_audio("winner.wav")
+            self.get_logger().info("Game ended. Announcing winner.")
+            # Reset the game
+            self.state = self.STATE_IDLE
+            self.state_start_time = self.get_clock().now()
+            self.players_remaining = 5  # Reset player count
+            self.get_logger().info("Resetting game. Switching to IDLE state.")
+
+        else:
+            # Default to stop
+            out_vel.linear.x = 0.0
+            out_vel.angular.z = 0.0
+            self.get_logger().warn("Unknown state. Stopping the robot.")
 
         # Publish velocities
         self.vel_pub.publish(out_vel)
 
-    def check_for_obstacles(self):
+    def play_audio(self, file_name):
         """
-        Processes the depth image to check for obstacles in front of the robot.
-        Returns True if obstacle detected within threshold distance.
+        Play an audio file using an external command.
         """
-        if self.depth_image is None:
-            return False  # No depth data available, assume no obstacles
+        audio_file_path = f"/home/your_username/audio_files/{file_name}"
+        subprocess.Popen(["aplay", audio_file_path])
+        self.get_logger().info(f"Playing audio: {file_name}")
 
-        # Define the region of interest (ROI) in the depth image
-        # For example, take the central part of the image
-        roi_width = int(self.DEPTH_IMAGE_WIDTH * 0.2)
-        roi_height = int(self.DEPTH_IMAGE_HEIGHT * 0.2)
-        x_offset = int((self.DEPTH_IMAGE_WIDTH - roi_width) / 2)
-        y_offset = int((self.DEPTH_IMAGE_HEIGHT - roi_height) / 2)
+    def random_direction(self):
+        """
+        Randomly select a direction for the robot to face.
+        """
+        # Random angle between 0 and 2*pi radians
+        self.current_direction_angle = random.uniform(0, 2 * math.pi)
+        # Rotate the robot to face this direction
+        self.rotate_to_angle(self.current_direction_angle)
+        self.get_logger().info(
+            f"Random direction selected: {math.degrees(self.current_direction_angle):.2f} degrees"
+        )
 
-        roi = self.depth_image[
-            y_offset : y_offset + roi_height, x_offset : x_offset + roi_width
-        ]
+    def rotate_to_angle(self, target_angle):
+        """
+        Rotate the robot to face the target angle.
+        """
+        # For simplicity, we'll assume instantaneous rotation
+        # In practice, you would implement rotation over time
+        # Here we'll simulate rotation by publishing angular velocity until the desired angle is reached
 
-        # Check if any depth values in the ROI are below the obstacle threshold
-        # Also, we need to handle NaN or zero values in depth data
-        valid_depths = roi[np.isfinite(roi)]
-        valid_depths = valid_depths[valid_depths > 0.0]
+        # Get current orientation (assuming we have access to odometry or IMU data)
+        # For this example, we'll assume the robot can rotate to the target angle instantly
+        pass  # Implement rotation logic if necessary
 
-        if valid_depths.size == 0:
-            return False  # No valid depth data in ROI, assume no obstacles
+    def detect_collision(self):
+        """
+        Detect if a player is in front of the robot.
+        """
+        if self.last_scan is None:
+            return False
 
-        min_distance = np.min(valid_depths)
+        # Get scan parameters
+        angle_min = self.last_scan.angle_min
+        angle_increment = self.last_scan.angle_increment
+        ranges = self.last_scan.ranges
+        num_ranges = len(ranges)
 
-        self.get_logger().info(f"Minimum distance in ROI: {min_distance:.2f} meters")
+        # Index corresponding to 0 degrees (front)
+        index_center = int((-angle_min) / angle_increment)
 
-        if min_distance < self.OBSTACLE_DISTANCE_THRESHOLD:
-            return True  # Obstacle detected
+        # Indices for +/- 15 degrees
+        angle_range = 15 * (math.pi / 180)  # 15 degrees in radians
+        index_range = int(angle_range / angle_increment)
+
+        index_min = max(0, index_center - index_range)
+        index_max = min(num_ranges - 1, index_center + index_range)
+
+        # Get the ranges in front
+        front_ranges = ranges[index_min : index_max + 1]
+
+        # Check if any of the ranges are less than collision distance threshold
+        for distance in front_ranges:
+            if 0 < distance < self.OBSTACLE_DISTANCE_THRESHOLD:
+                return True
+        return False
+
+    def detect_boundary(self):
+        """
+        Detect if the robot has reached a boundary.
+        """
+        if self.last_scan is None:
+            return False
+
+        # Assuming boundaries are detected when obstacles are close on all sides
+        # Check left, right, and front
+
+        ranges = self.last_scan.ranges
+        num_ranges = len(ranges)
+
+        # Indices for front, left, and right
+        angle_min = self.last_scan.angle_min
+        angle_increment = self.last_scan.angle_increment
+
+        index_center = int((-angle_min) / angle_increment)
+        angle_90 = 90 * (math.pi / 180)
+        index_left = int((angle_90 - angle_min) / angle_increment)
+        index_right = int((-angle_90 - angle_min) / angle_increment)
+
+        # Get distances
+        distance_front = ranges[index_center]
+        distance_left = ranges[index_left]
+        distance_right = ranges[index_right]
+
+        # Check if any distances are less than boundary threshold
+        if (
+            0 < distance_front < self.BOUNDARY_DISTANCE_THRESHOLD
+            or 0 < distance_left < self.BOUNDARY_DISTANCE_THRESHOLD
+            or 0 < distance_right < self.BOUNDARY_DISTANCE_THRESHOLD
+        ):
+            return True
         else:
-            return False  # No obstacle detected
+            return False
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    approach_person_node = ApproachPersonNode()
+    game_node = GreenRedLightGameNode()
 
-    rclpy.spin(approach_person_node)
+    rclpy.spin(game_node)
 
-    approach_person_node.destroy_node()
+    game_node.destroy_node()
     rclpy.shutdown()
 
 
