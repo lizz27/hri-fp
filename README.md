@@ -156,3 +156,9 @@ colcon build --symlink-install
 source install/setup.bash
 ros2 run robot_control_architecture_pkg robot_control_architecture_node
 ```
+
+---
+
+```
+ros2 pkg create --build-type ament_python --license Apache-2.0 --node-name robot_control_architecture_node robot_control_architecture_pkg
+```
