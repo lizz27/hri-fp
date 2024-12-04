@@ -1,0 +1,1 @@
+/home/ubuntu/hri-project/ros2_ws/src/robot_control_architecture_pkg/setup.py

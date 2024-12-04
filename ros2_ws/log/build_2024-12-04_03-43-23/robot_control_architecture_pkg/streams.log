@@ -1,0 +1,19 @@
+[3.777s] Invoking command in '/home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg': PYTHONPATH=/home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/build --no-deps symlink_data --force
+[5.246s] running develop
+[6.223s] running egg_info
+[6.226s] writing robot_control_architecture_pkg.egg-info/PKG-INFO
+[6.229s] writing dependency_links to robot_control_architecture_pkg.egg-info/dependency_links.txt
+[6.230s] writing entry points to robot_control_architecture_pkg.egg-info/entry_points.txt
+[6.232s] writing requirements to robot_control_architecture_pkg.egg-info/requires.txt
+[6.233s] writing top-level names to robot_control_architecture_pkg.egg-info/top_level.txt
+[6.244s] reading manifest file 'robot_control_architecture_pkg.egg-info/SOURCES.txt'
+[6.255s] writing manifest file 'robot_control_architecture_pkg.egg-info/SOURCES.txt'
+[6.260s] running build_ext
+[6.264s] Creating /home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages/robot-control-architecture-pkg.egg-link (link to .)
+[6.269s] Installing robot_control_architecture_node script to /home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/lib/robot_control_architecture_pkg
+[6.272s] 
+[6.273s] Installed /home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg
+[6.274s] running symlink_data
+[6.277s] symbolically linking /home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/resource/robot_control_architecture_pkg -> /home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/share/ament_index/resource_index/packages
+[6.286s] symbolically linking /home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/package.xml -> /home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/share/robot_control_architecture_pkg
+[6.481s] Invoked command in '/home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg' returned '0': PYTHONPATH=/home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/ubuntu/hri-project/ros2_ws/install/robot_control_architecture_pkg/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/ubuntu/hri-project/ros2_ws/build/robot_control_architecture_pkg/build --no-deps symlink_data --force
